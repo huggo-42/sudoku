@@ -25,11 +25,8 @@ class _SudokuPageState extends State<SudokuPage> {
     newSudoku = sudokuGenerator.newSudoku;
     newSudokuSolved = sudokuGenerator.newSudokuSolved;
 
-    printTool("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
     for (int i = 0; i < newSudokuSolved.length; ++i) {
-      printTool("\nline: $i");
       for (int j = 0; j < newSudokuSolved[i].length; ++j) {
-        printTool("test: ${newSudokuSolved[i][j]}");
         int boxIndex = getBoxIndex(i, j);
         int rowIndex = getRowIndex(boxIndex);
         int indexInRow = getIndexInRow(rowIndex, boxIndex);
@@ -47,7 +44,6 @@ class _SudokuPageState extends State<SudokuPage> {
         board.append(box);
       }
     }
-    printTool("\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
   }
 
   void printSudoku() {
@@ -68,6 +64,7 @@ class _SudokuPageState extends State<SudokuPage> {
 
     super.initState();
   }
+
   int selectedValue = 0;
 
   void boxSelected(int index, int idx) {
@@ -122,131 +119,165 @@ class _SudokuPageState extends State<SudokuPage> {
         title: const Text("Sudoku by huggo-42"),
       ),
       body: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(5),
-          alignment: Alignment.center,
-          child: GridView.builder(
-            itemCount: 9,
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              // crossAxisSpacing: 5,
-              // mainAxisSpacing: 5,
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(5),
+              alignment: Alignment.center,
+              child: GridView.builder(
+                itemCount: 9,
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  // crossAxisSpacing: 5,
+                  // mainAxisSpacing: 5,
+                ),
+                physics: const ScrollPhysics(),
+                itemBuilder: (BuildContext ctx, int index) {
+                  List<int> bottomAdd = [6, 7, 8];
+                  List<int> leftAdd = [0, 3, 6];
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: const BorderSide(
+                          color: blue600,
+                          width: 1.5,
+                        ),
+                        left: BorderSide(
+                          color: blue600,
+                          width: leftAdd.contains(index) ? 1.5 : 0,
+                        ),
+                        right: const BorderSide(
+                          color: blue600,
+                          width: 1.5,
+                        ),
+                        bottom: BorderSide(
+                          color: blue600,
+                          width: bottomAdd.contains(index) ? 2 : 0,
+                        ),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: GridView.builder(
+                      // itemCount: boxInner.blokChars.length,
+                      itemCount: 9,
+                      shrinkWrap: true,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 1,
+                        // crossAxisSpacing: 2,
+                        // mainAxisSpacing: 2,
+                      ),
+                      physics: const ScrollPhysics(),
+                      itemBuilder: (BuildContext buildContext, int idx) {
+                        Box box =
+                            board.getBoxByBlockIndexAndInBlockIndex(index, idx);
+                        Color color = white;
+                        Color colorText = blue500;
+                        if (box.isHighlight) {
+                          color = blue100;
+                        }
+                        if (box.value == selectedValue && selectedValue != 0) {
+                          color = blue200;
+                        }
+
+                        List<int> shouldHaveBottomRight = [0, 1, 3, 4];
+                        List<int> shouldHaveBottom = [2, 5];
+                        List<int> shouldHaveLeft = [7, 8];
+                        double bottomBorderWidth = 0;
+                        if (shouldHaveBottomRight.contains(idx) ||
+                            shouldHaveBottom.contains(idx)) {
+                          bottomBorderWidth = .5;
+                        }
+
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: color,
+                            // TODO: HERE MEN
+                            border: Border(
+                              left: BorderSide(
+                                color: colorText,
+                                width: shouldHaveLeft.contains(idx) ? .5 : 0,
+                              ),
+                              right: BorderSide(
+                                color: colorText,
+                                width: shouldHaveBottomRight.contains(idx)
+                                    ? .5
+                                    : 0,
+                              ),
+                              bottom: BorderSide(
+                                color: colorText,
+                                width: bottomBorderWidth,
+                              ),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            onPressed: () => boxSelected(index, idx),
+                            child: Text(
+                              /**
+                              * 1. index = block
+                              * 2. idx = index in block
+                              * ------------------------------------------
+                              * Getting a value from newSudokuSolved
+                              * newSudoku[rowIndex][insideRowIndex]
+                              */
+                              // "${getBoxValue(index, idx)}",
+                              board
+                                          .getBoxByBlockIndexAndInBlockIndex(
+                                              index, idx)
+                                          .value ==
+                                      0
+                                  ? ''
+                                  : board
+                                          .getBoxByBlockIndexAndInBlockIndex(
+                                              index, idx)
+                                          .value
+                                          .toString() ??
+                                      '',
+                              style: TextStyle(
+                                color: colorText,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
-            physics: const ScrollPhysics(),
-            itemBuilder: (BuildContext ctx, int index) {
-              printTool("[FUCKER], index: $index");
-              List<int> bottomAdd = [6, 7, 8];
-              List<int> leftAdd = [0, 3, 6];
-              return Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: const BorderSide(
-                      color: blue600,
-                      width: 1.5,
-                    ),
-                    left: BorderSide(
-                      color: blue600,
-                      width: leftAdd.contains(index) ? 1.5 : 0,
-                    ),
-                    right: const BorderSide(
-                      color: blue600,
-                      width: 1.5,
-                    ),
-                    bottom: BorderSide(
-                      color: blue600,
-                      width: bottomAdd.contains(index) ? 2 : 0,
-                    ),
-                  ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              alignment: Alignment.center,
+              child: GridView.builder(
+                itemCount: 9,
+                shrinkWrap: true,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 9,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 2,
                 ),
-                alignment: Alignment.center,
-                child: GridView.builder(
-                  // itemCount: boxInner.blokChars.length,
-                  itemCount: 9,
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 1,
-                    // crossAxisSpacing: 2,
-                    // mainAxisSpacing: 2,
-                  ),
-                  physics: const ScrollPhysics(),
-                  itemBuilder: (BuildContext buildContext, int idx) {
-                    Box box =
-                        board.getBoxByBlockIndexAndInBlockIndex(index, idx);
-                    Color color = white;
-                    Color colorText = blue500;
-                    if (box.isHighlight) {
-                      color = blue100;
-                    }
-                    if (box.value == selectedValue && selectedValue != 0) {
-                      color = blue200;
-                    }
-
-                    List<int> shouldHaveBottomRight = [0, 1, 3, 4];
-                    List<int> shouldHaveBottom = [2, 5];
-                    List<int> shouldHaveLeft = [7, 8];
-                    double bottomBorderWidth = 0;
-                    if (shouldHaveBottomRight.contains(idx) ||
-                        shouldHaveBottom.contains(idx)) {
-                      bottomBorderWidth = .5;
-                    }
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: color,
-                        // TODO: HERE MEN
-                        border: Border(
-                          left: BorderSide(
-                            color: colorText,
-                            width: shouldHaveLeft.contains(idx) ? .5 : 0,
-                          ),
-                          right: BorderSide(
-                            color: colorText,
-                            width: shouldHaveBottomRight.contains(idx) ? .5 : 0,
-                          ),
-                          bottom: BorderSide(
-                            color: colorText,
-                            width: bottomBorderWidth,
-                          ),
-                        ),
+                physics: const ScrollPhysics(),
+                itemBuilder: (BuildContext buildContext, int idx) {
+                  return TextButton(
+                    onPressed: () =>
+                        printTool("Keyboard pressed vale: ${idx + 1}"),
+                    child: Text(
+                      "${idx + 1}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: blue500,
+                        fontWeight: FontWeight.bold,
                       ),
-                      alignment: Alignment.center,
-                      child: TextButton(
-                        onPressed: () => boxSelected(index, idx),
-                        child: Text(
-                          /**
-                          * 1. index = block
-                          * 2. idx = index in block
-                          * ------------------------------------------
-                          * Getting a value from newSudokuSolved
-                          * newSudoku[rowIndex][insideRowIndex]
-                          */
-                          // "${getBoxValue(index, idx)}",
-                          board
-                                      .getBoxByBlockIndexAndInBlockIndex(
-                                          index, idx)
-                                      .value ==
-                                  0
-                              ? ''
-                              : board
-                                      .getBoxByBlockIndexAndInBlockIndex(
-                                          index, idx)
-                                      .value
-                                      .toString() ??
-                                  '',
-                          style: TextStyle(
-                            color: colorText,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
