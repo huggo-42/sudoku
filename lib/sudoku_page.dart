@@ -65,7 +65,8 @@ class _SudokuPageState extends State<SudokuPage> {
     super.initState();
   }
 
-  int selectedValue = 0;
+  int selectedValue = -1;
+  int selectedIndex = -1;
 
   void boxSelected(int index, int idx) {
     board.setAllBoxHighlightToFalse();
@@ -73,6 +74,7 @@ class _SudokuPageState extends State<SudokuPage> {
     int rowIndex = getRowIndex(boxIndex);
     int colIndex = getColIndex(boxIndex);
     selectedValue = board.getBox(boxIndex).value;
+    selectedIndex = boxIndex;
     printTool("Box selected index: $boxIndex");
     printTool("Box selected row: $rowIndex");
     printTool("Box selected column: $colIndex");
@@ -101,6 +103,16 @@ class _SudokuPageState extends State<SudokuPage> {
       }
     }
     setState(() {});
+  }
+
+  void handleKeyboardPress(int input) {
+    Box box = board.getBox(selectedIndex);
+    if (box.value != box.correctValue) {
+      box.value = input;
+      int rowIndex = getRowIndex(selectedIndex);
+      boxSelected(rowIndex, getIndexInRow(rowIndex, selectedIndex));
+      setState(() {});
+    }
   }
 
   @override
@@ -216,6 +228,13 @@ class _SudokuPageState extends State<SudokuPage> {
                           alignment: Alignment.center,
                           child: TextButton(
                             onPressed: () => boxSelected(index, idx),
+                            style: TextButton.styleFrom(
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(0),
+                                ),
+                              ),
+                            ),
                             child: Text(
                               /**
                               * 1. index = block
@@ -263,8 +282,7 @@ class _SudokuPageState extends State<SudokuPage> {
                 physics: const ScrollPhysics(),
                 itemBuilder: (BuildContext buildContext, int idx) {
                   return TextButton(
-                    onPressed: () =>
-                        printTool("Keyboard pressed vale: ${idx + 1}"),
+                    onPressed: () => handleKeyboardPress(idx + 1),
                     child: Text(
                       "${idx + 1}",
                       style: const TextStyle(
