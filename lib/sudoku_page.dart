@@ -68,13 +68,14 @@ class _SudokuPageState extends State<SudokuPage> {
 
     super.initState();
   }
+  int selectedValue = 0;
 
   void boxSelected(int index, int idx) {
     board.setAllBoxHighlightToFalse();
     int boxIndex = getBoxIndex(index, idx);
-    board.boxes[boxIndex]!.focus = true;
     int rowIndex = getRowIndex(boxIndex);
     int colIndex = getColIndex(boxIndex);
+    selectedValue = board.getBox(boxIndex).value;
     printTool("Box selected index: $boxIndex");
     printTool("Box selected row: $rowIndex");
     printTool("Box selected column: $colIndex");
@@ -179,9 +180,8 @@ class _SudokuPageState extends State<SudokuPage> {
                     if (box.isHighlight) {
                       color = blue100;
                     }
-                    if (box.focus) {
-                      color = blue500;
-                      colorText = Colors.white;
+                    if (box.value == selectedValue && selectedValue != 0) {
+                      color = blue200;
                     }
 
                     List<int> shouldHaveBottomRight = [0, 1, 3, 4];

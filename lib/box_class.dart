@@ -21,7 +21,6 @@ class Board {
   void setAllBoxHighlightToFalse() {
     for (Box item in boxes.values) {
       item.isHighlight = false;
-      item.focus = false;
     }
   }
 
@@ -47,7 +46,6 @@ class Box {
   int col;
   bool isSolved;
   bool isHighlight;
-  bool focus;
 
   Box({
     required this.value,
@@ -58,6 +56,5 @@ class Box {
     required this.col,
     required this.isSolved,
     this.isHighlight = false,
-    this.focus = false,
   });
 }
